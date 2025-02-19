@@ -1,0 +1,108 @@
+import java.util.*;
+ public class SRTFScheduler {
+ 
+ // process are stored by arriving time before sceduling begins so if two process have same reminig time the procss who arrived erlair is served
+    public static void sortProcessesByArrivalTime(Process[] processes, int n) {//Processes are sorted by arrival time
+          for (int j = 0; j < n - 1; j++) {
+          if (processes[j].arrivalTime > processes[j + 1].arrivalTime) {
+              Process temp = processes[j];
+             processes[j] = processes[j + 1];
+             processes[j + 1] = temp;
+        }
+      }
+      }
+      
+      
+        public static void scheduleProcesses(Process[] processes, int n) {
+        int currentTime = 0, completed = 0, totalTurnaround = 0, totalWaiting = 0;
+        boolean isCpuIdle = true;
+        Process currentProcess = null;
+        StringBuilder ganttChart = new StringBuilder("Time  Process/CS\n");
+        
+        while (completed < n) {//A loop runs until all processes are completed.
+
+            int minRemainingTime = Integer.MAX_VALUE;
+            Process selectedProcess = null;// the process that should run next based on SRTF
+            
+            
+     // Find the process with the shortest remaining time
+   for (int i = 0; i < n; i++) {
+     Process p = processes[i];
+   if (p.getArrivalTime() <= currentTime && p.getRemainingTime() > 0 && p.getRemainingTime() < minRemainingTime) {
+                    minRemainingTime = p.getRemainingTime();
+                    selectedProcess = p;
+                }
+            }
+             // Handle context switching
+            if (currentProcess != selectedProcess){// the CPU is switching from one process to another 
+                if (currentProcess != null) {//ensures context switching occures only if there is previousrunning process 
+                    ganttChart.append(currentTime).append("-").append(currentTime + 1).append("  CS\n");
+                    currentTime++;// Account for context switch time
+
+                }
+                currentProcess = selectedProcess;
+            }
+            
+            if (currentProcess != null) {
+                if (currentProcess.startTime == -1)
+                    currentProcess.startTime = currentTime;
+                
+                ganttChart.append(currentTime).append("-").append(currentTime + 1).append("  P").append(currentProcess.id).append("\n");
+                currentProcess.remainingTime--;
+                
+                if (currentProcess.remainingTime == 0) {
+                    currentProcess.completionTime = currentTime + 1;
+                    completed++;
+                    isCpuIdle = true;
+                } else {
+                    isCpuIdle = false;
+                }
+            }
+            currentTime++;
+        }
+        
+        
+        
+        // Compute performance metrics
+        int totalCpuTime = currentTime - 1;
+        for (int i = 0; i < n; i++) {
+            Process p = processes[i];
+            int turnaroundTime = p.getCompletionTime() - p.getArrivalTime();
+            int waitingTime = turnaroundTime - p.getBurstTime();
+            totalTurnaround += turnaroundTime;
+            totalWaiting += waitingTime;
+        }
+        
+        double avgTurnaround = (double) totalTurnaround / n;
+        double avgWaiting = (double) totalWaiting / n;
+        double cpuUtilization = ((double) (totalCpuTime - (completed - 1))) / totalCpuTime * 100;
+        
+        System.out.println("\nScheduling Algorithm: Shortest Remaining Time First");
+        System.out.println("Context Switch: 1 ms\n");
+        System.out.print(ganttChart);
+        System.out.println("\nPerformance Metrics");
+        System.out.printf("Average Turnaround Time: %.2f\n", avgTurnaround);
+        System.out.printf("Average Waiting Time: %.2f\n", avgWaiting);
+        System.out.printf("CPU Utilization: %.2f%%\n", cpuUtilization);
+    }
+    
+   // main
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        System.out.print("Enter the number of processes: ");
+        int n = scanner.nextInt();
+        
+        Process[] processes = new Process[n];
+        for (int i = 0; i < n; i++) {
+            System.out.print("Enter arrival time and burst time for Process P" + (i + 1) + ": ");
+            int arrival = scanner.nextInt();
+            int burst = scanner.nextInt();
+            processes[i] = new Process(i + 1, arrival, burst);
+        }
+        
+        sortProcessesByArrivalTime(processes, n);
+        scheduleProcesses(processes, n);    }
+        
+        
+
+}
