@@ -1,0 +1,130 @@
+import java.util.*;
+
+public class SchedulerSim {
+    // currentTime
+    static int ctime = 0;
+    
+    // completedProcesses
+    static int pCount = 0;
+    
+    // 'totalWait'
+    static int totalWaitTime = 0;
+    
+    // 'totalTurnaround'
+    static int totalTurnaroundTime = 0;
+    
+    //'contextSwitchTime'
+    static final int switchTime = 1;
+    
+    //'ganttChart' 
+    static List<String> timeline = new ArrayList<>();
+    
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+       
+        System.out.print("Enter the number of processes: ");
+        int numProcs = sc.nextInt();
+        
+        int[] arrTimes = new int[numProcs];
+        int[] burstTimes = new int[numProcs];  
+        int[] remTimes = new int[numProcs];
+        int[] compTimes = new int[numProcs];
+        int[] startTimes = new int[numProcs];
+        
+        for (int i = 0; i < numProcs; i++) {
+            System.out.println("Enter P" + (i + 1) + " information:");
+            System.out.print("Arrival time: ");
+            arrTimes[i] = sc.nextInt();
+            System.out.print("Burst time: ");
+            burstTimes[i] = sc.nextInt();
+            remTimes[i] = burstTimes[i];  // Initial remaining time is the same as burst time
+            compTimes[i] = -1;  // -1 signifies the process has not been completed yet
+            startTimes[i] = -1;  // -1 signifies the process has not started yet
+        }
+
+        System.out.println("\nNumber of processes = " + numProcs);
+        for (int i = 0; i < numProcs; i++) {
+            System.out.println("P" + (i + 1) + ": Arrival time = " + arrTimes[i] + ", Burst time = " + burstTimes[i] + "ms");
+        }
+        System.out.println("\nScheduling Algorithm: Shortest Remaining Time First");
+        System.out.println("Context Switch: 1ms");
+        
+    
+        executeScheduler(arrTimes, burstTimes, remTimes, compTimes, startTimes, numProcs);
+    }
+
+
+    public static void executeScheduler(int[] arrTimes, int[] burstTimes, int[] remTimes, int[] compTimes, int[] startTimes, int numProcs) {
+        while (pCount < numProcs) {
+            int selectedProc = pickProcess(arrTimes, remTimes, numProcs);
+            if (selectedProc != -1) {
+                if (!timeline.isEmpty() && !timeline.get(timeline.size() - 1).endsWith("P" + (selectedProc + 1))) {
+                    timeline.add(ctime + "-" + (ctime + switchTime) + ": CS");
+                    ctime += switchTime;  // Add context switch time
+                }
+                
+                recordStart(selectedProc, startTimes);
+                
+                // Adds the process event to the Gantt chart
+                timeline.add(ctime + "-" + (ctime + 1) + ": P" + (selectedProc + 1));
+                remTimes[selectedProc]--;  // Decrease remaining burst time for the process
+                ctime++;  // Increment system time by 1
+                
+                if (remTimes[selectedProc] == 0) {
+                    compTimes[selectedProc] = ctime;  // Mark process as completed
+                    pCount++;  // Increment completed process count
+                }
+            } else {
+                ctime++;  // If no process can run, increment system time
+            }
+        }
+        
+        computeMetrics(arrTimes, burstTimes, compTimes, numProcs);
+        showResults(timeline, numProcs);
+    }
+
+    public static int pickProcess(int[] arrTimes, int[] remTimes, int numProcs) {
+        int selected = -1;
+        int shortest = Integer.MAX_VALUE;
+        
+        for (int i = 0; i < numProcs; i++) {
+            if (remTimes[i] > 0 && arrTimes[i] <= ctime) {
+                if (remTimes[i] < shortest || (remTimes[i] == shortest && arrTimes[i] < arrTimes[selected])) {
+                    shortest = remTimes[i];
+                    selected = i;
+                }
+            }
+        }
+        return selected;
+}
+    public static void recordStart(int process, int[] startTimes) {
+        if (startTimes[process] == -1) {
+            startTimes[process] = ctime;
+        }
+    }
+    
+    public static void computeMetrics(int[] arrTimes, int[] burstTimes, int[] compTimes, int numProcs) {
+        for (int i = 0; i < numProcs; i++) {
+            int turnaroundTime = compTimes[i] - arrTimes[i];
+            int waitTime = turnaroundTime - burstTimes[i];
+            totalTurnaroundTime += turnaroundTime;
+            totalWaitTime += waitTime;
+        }
+    }
+    public static void showResults(List<String> timeline, int numProcs) {
+        System.out.println("\nGantt Chart:");
+        System.out.printf("%-10s %s\n", "Time", "Process/CS");
+        for (String entry : timeline) {
+            System.out.println(entry);
+        }
+
+        double avgTurnaround = (double) totalTurnaroundTime / numProcs;
+        double avgWaitTime = (double) totalWaitTime / numProcs;
+        double cpuUtil = ((double) (ctime - (pCount * switchTime)) / ctime) * 100;
+
+        System.out.println("\nPerformance Metrics:");
+        System.out.println("Average Turnaround Time: " + avgTurnaround);
+        System.out.println("Average Waiting Time: " + avgWaitTime);
+        System.out.println("CPU Utilization: " + String.format("%.2f", cpuUtil) + "%");
+    }
+}
