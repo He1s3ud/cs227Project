@@ -1,0 +1,28 @@
+import java.util.*;
+
+public class schadularDemo{
+public static void main(String[] args){
+Scanner input=new Scanner(System.in);
+TheSchadular ourSchaduler=new TheSchadular();
+System.out.print("Enter the number of processes: ");
+int n=input.nextInt();
+Process[] processes = new Process[n];
+
+for(int i=0;i<n;i++){
+System.out.println("Enter P"+(i+1)+" information");
+System.out.print("arrival time: ");
+int arr=input.nextInt();
+System.out.print("Burst time: ");
+int burst=input.nextInt();
+processes[i]=new Process((i+1),arr,burst);
+}
+
+System.out.println("\n\n\n--------------------------------\nTHE OUTPUT:");
+System.out.println("Number	of	processes= "+n);
+System.out.println("Arrival times and burst times as follows:");
+for(int i=0;i<n;i++)
+System.out.println("P"+(processes[i].getId())+": Arrival time= "+processes[i].getArrivalTime()+", Burst time= "+processes[i].getBurstTime()+"ms");
+System.out.println("SchedulinAlgorithm: Shortest remaining time first\nContext Switch: 1ms");
+ourSchaduler.scheduler(processes,n);
+}
+}

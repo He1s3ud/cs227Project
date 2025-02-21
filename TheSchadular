@@ -1,0 +1,114 @@
+import java.util.*;
+
+public class TheSchadular{
+   public static Scanner input=new Scanner(System.in);
+   public int totalWait, totalTurnAround,completProcess,currentTime;//the event-driven attrbuite
+   //private boolean cpuEmpty;//خرابيط
+   private Process current;
+   //public String gantChart;//خرابيط
+ 
+   public TheSchadular(){
+      totalWait=0;
+      totalTurnAround=0;
+      completProcess=0;
+      currentTime=0;
+      //cpuEmpty=false;
+      current=null;
+      //gantChart="";
+   }
+
+   public TheSchadular(Process c){
+      totalWait=0;
+      totalTurnAround=0;
+      completProcess=0;
+      currentTime=0;
+      //cpuEmpty=false;
+      current=c;
+      //gantChart="";
+   }
+   
+   public void scheduler(Process[] processes, int num){
+      
+      //List<processGantChart> firstGant=new ArrayList<>();
+      processGantChart[] firstGant=new processGantChart[100];//this array to collect any one unit time uccor in the cpu since the gant chart be like 1-2 P1
+      int firstGantCounter=0;//this counter for the array to protect us from the errors like out of bounds exception
+      while(completProcess<num){
+        int shortTime= Integer.MAX_VALUE;
+        Process selected=null; // the process that should run next based on SJF
+         for(int i=0;i<num;i++){
+            Process temp=processes[i];
+         
+            if(temp.getRemainingTime() > 0 && temp.getRemainingTime() < shortTime) {//the select the smaller remaining time always
+               shortTime=temp.getRemainingTime();
+               selected=temp;
+            }
+            else if(temp.getRemainingTime()>0&&temp.getRemainingTime()==shortTime){// i think i have problem here
+               if(temp.getArrivalTime() <= currentTime){//if two processes the same remaining time, this condetion make the first arrival time selected  
+                  shortTime=temp.getRemainingTime();
+                  selected=temp;
+               }
+            }
+        }
+            if (current!=selected){
+               if(current!=null){
+                  //firstGant.add(new processGantChart(currentTime,currentTime+1,"CS"));
+                  firstGant[firstGantCounter]=new processGantChart(currentTime,currentTime+1,"CS");
+                  firstGantCounter++;
+                  currentTime++;
+               }
+               current=selected;
+            }
+         
+            else if(current!=null){
+               if(current.getStartTime()==-1)
+                  current.setStartTime(currentTime);
+               //firstGant.add(new processGantChart(currentTime,currentTime+1,("P"+(current.getId()))));
+               firstGant[firstGantCounter]=new processGantChart(currentTime,currentTime+1,("P"+current.getId()));
+               firstGantCounter++;
+               current.setRemainingTime(current.getRemainingTime()-1);
+               currentTime++;
+            
+               if(current.getRemainingTime()==0){
+                  current.setCompletTime(currentTime+1);
+                  completProcess++;
+               }
+            }
+         }
+      
+      //List<processGantChart> finalGant=new ArrayList<>();
+      processGantChart[] finalGant=new processGantChart[100];//this array to marge all sequence similar processes since the gant chart be like 1-4 P1
+      int finalGantCounter=0;//and this the counter to protect from errors
+      processGantChart prev=firstGant[0];//since we compare between this process and the current process
+      for(int i=1;i<firstGantCounter;i++){
+         processGantChart temp=firstGant[i];//this is the current process
+         if(!prev.processType.equalsIgnoreCase("CS")&&prev.processType.equalsIgnoreCase(temp.processType))//if the process dosen't context switch and the current is same to the previous process we make the previous end time like the current end time 
+            prev.end=temp.end;
+         else{//if the process is CS or the current not like the previous we take the previous process to the final gant chart array
+            finalGant[finalGantCounter]=prev;
+            finalGantCounter++;
+            prev=temp;// the current process now be old and we make it previous process to compare the next processes with it  
+         }
+      }
+      //the output format
+      System.out.println("Scheduling Algorithm: Shortest remaining	time first\nContext Switch: 1ms");
+      System.out.println("Gant Chart:");
+      System.out.printf("%-7s %s\n","Time","Process/CS");//the gant chart
+      for(int i=0;i<finalGantCounter;i++){//here we print all processes and thier be like 2-6 P2 and so on
+      // gantChart+=finalGant.get(i).start+"-"+finalGant.get(i).end+"\t\t"+finalGant.get(i).processType+"\n";
+         System.out.printf("%-7s %s\n",(finalGant[i].start+"-"+finalGant[i].end),finalGant[i].processType);
+      }
+      Process temp=null;
+      int TurnAround=0;
+      for(int i=0;i<num;i++){
+         temp=processes[i];
+         TurnAround+=temp.getCompletTime()-temp.getArrivalTime();
+         totalWait+=TurnAround-temp.getBurstTime();
+         totalTurnAround+=TurnAround;
+      }
+      double avgTurnAround=(double)totalTurnAround/num;
+      double avgWaitTime=(double)totalWait/num;
+      double cpuUti=(double)(currentTime-completProcess)/(currentTime*100);
+      System.out.println("Performance	Metric\nAverage Turnaround	Time: "+avgTurnAround+"\nAverage Waiting Time: "+avgWaitTime+"\nCPU Utilization: "+cpuUti);
+             
+   }
+}
