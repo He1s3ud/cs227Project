@@ -3,17 +3,13 @@ import java.util.*;
 public class SchedulerSim {
     // currentTime
     static int ctime = 0;
-    
     // completedProcesses
-    static int pCount = 0;
-    
+    static int pCount = 0;   
     // 'totalWait'
     static int totalWaitTime = 0;
-    
     // 'totalTurnaround'
     static int totalTurnaroundTime = 0;
-    
-    //'contextSwitchTime'
+     //'contextSwitchTime'
     static final int switchTime = 1;
     
     //'ganttChart' 
@@ -21,8 +17,7 @@ public class SchedulerSim {
     
     public static void main(String[] args) {
         Scanner sc = new Scanner(System.in);
-       
-        System.out.print("Enter the number of processes: ");
+    System.out.print("Enter the number of processes: ");
         int numProcs = sc.nextInt();
         
         int[] arrTimes = new int[numProcs];
@@ -30,8 +25,7 @@ public class SchedulerSim {
         int[] remTimes = new int[numProcs];
         int[] compTimes = new int[numProcs];
         int[] startTimes = new int[numProcs];
-        
-        for (int i = 0; i < numProcs; i++) {
+    for (int i = 0; i < numProcs; i++) {
             System.out.println("Enter P" + (i + 1) + " information:");
             System.out.print("Arrival time: ");
             arrTimes[i] = sc.nextInt();
@@ -44,13 +38,10 @@ public class SchedulerSim {
 
         System.out.println("\nNumber of processes = " + numProcs);
         for (int i = 0; i < numProcs; i++) {
-            System.out.println("P" + (i + 1) + ": Arrival time = " + arrTimes[i] + ", Burst time = " + burstTimes[i] + "ms");
-        }
+            System.out.println("P" + (i + 1) + ": Arrival time = " + arrTimes[i] + ", Burst time = " + burstTimes[i] + "ms");}
         System.out.println("\nScheduling Algorithm: Shortest Remaining Time First");
         System.out.println("Context Switch: 1ms");
-        
-    
-        executeScheduler(arrTimes, burstTimes, remTimes, compTimes, startTimes, numProcs);
+ executeScheduler(arrTimes, burstTimes, remTimes, compTimes, startTimes, numProcs);
     }
 
 
@@ -112,19 +103,18 @@ public class SchedulerSim {
         }
     }
     public static void showResults(List<String> timeline, int numProcs) {
-        System.out.println("\nGantt Chart:");
         System.out.printf("%-10s %s\n", "Time", "Process/CS");
         for (String entry : timeline) {
             System.out.println(entry);
         }
 
-        double avgTurnaround = (double) totalTurnaroundTime / numProcs;
-        double avgWaitTime = (double) totalWaitTime / numProcs;
+        int avgTurnaround =totalTurnaroundTime / numProcs;
+        double avgWaitTime =(double) totalWaitTime / numProcs;
         double cpuUtil = ((double) (ctime - (pCount * switchTime)) / ctime) * 100;
 
         System.out.println("\nPerformance Metrics:");
         System.out.println("Average Turnaround Time: " + avgTurnaround);
         System.out.println("Average Waiting Time: " + avgWaitTime);
-        System.out.println("CPU Utilization: " + String.format("%.2f", cpuUtil) + "%");
+        System.out.println("CPU Utilization: " + String.format("%.2f", cpuUtil));
     }
 }
