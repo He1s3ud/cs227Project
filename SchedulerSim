@@ -38,17 +38,28 @@ public class SchedulerSim {
       
       List<Process> processes = new ArrayList<>();
       for (int i = 0; i < numProcs; i++) {
-         System.out.println("Enter P" + (i + 1) + " information:");
-         System.out.print("Arrival time: ");
+        System.out.print("Enter arrival time and burst time for Process P" + (i + 1) + ": "); // to change print format
          int arrivalTime = sc.nextInt();
-         System.out.print("Burst time: ");
          int burstTime = sc.nextInt();
          processes.add(new Process(i, arrivalTime, burstTime));
       }
    
       System.out.println("\nNumber of processes = " + numProcs);
+      //new 
+       System.out.print("("); // to print the opening parenthesis at the begining 
+
+       for(int i=1 ; i<= numProcs; i++){
+         System.out.print("P" + i);
+
+       if (i<numProcs) // to make sure, there's no comma after the last process
+       System.out.print(",");
+       }// end of the loop
+
+       System.out.println(")");
+       //end of the new part 
+
       for (Process p : processes) {
-         System.out.println("P" + (p.id + 1) + ": Arrival time = " + p.arrivalTime + ", Burst time = " + p.burstTime + "ms");
+         System.out.println("P" + (p.id + 1) + ": Arrival time = " + p.arrivalTime + ", Burst time = " + p.burstTime + " ms");
       }
       System.out.println("\nScheduling Algorithm: Shortest Remaining Time First");
       System.out.println("Context Switch: 1ms");
@@ -65,10 +76,10 @@ public class SchedulerSim {
           if (selectedProc != -1) {
               if (selectedProc != currentProcess) {
                   if (currentProcess != -1) {
-                      timeline.add(startTime + "-" + ctime + ": P" + (currentProcess + 1));
+                      timeline.add(startTime + "-" + ctime + "":         P" + (currentProcess + 1));
                   }
                   if (!timeline.isEmpty() && !timeline.get(timeline.size() - 1).endsWith("CS")) {
-                      timeline.add(ctime + "-" + (ctime + switchTime) + ": CS");
+                      timeline.add(ctime + "-" + (ctime + switchTime) + "":         CS");
                       ctime += switchTime; 
                   }
                   currentProcess = selectedProc;
@@ -82,7 +93,7 @@ public class SchedulerSim {
               if (processes.get(selectedProc).remainingTime == 0) {
                   processes.get(selectedProc).completionTime = ctime;
                   pCount++;
-                  timeline.add(startTime + "-" + ctime + ": P" + (selectedProc + 1));
+                  timeline.add(startTime + "-" + ctime + "":         P" + (selectedProc + 1));
                   currentProcess = -1;
               }
           } else {
