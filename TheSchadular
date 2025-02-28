@@ -81,7 +81,7 @@ public class TheSchadular{
       processGantChart prev=firstGant[0];//since we compare between this process and the current process
       for(int i=1;i<firstGantCounter;i++){
          processGantChart temp=firstGant[i];//this is the current process
-         if(!prev.processType.equalsIgnoreCase("CS")&&prev.processType.equalsIgnoreCase(temp.processType))//if the process dosen't context switch and the current is same to the previous process we make the previous end time like the current end time 
+         if((!prev.processType.equalsIgnoreCase("CS"))&&prev.processType.equalsIgnoreCase(temp.processType))//if the process dosen't context switch and the current is same to the previous process we make the previous end time like the current end time 
             prev.end=temp.end;
          else{//if the process is CS or the current not like the previous we take the previous process to the final gant chart array
             finalGant[finalGantCounter]=prev;
