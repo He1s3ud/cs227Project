@@ -32,17 +32,28 @@ public class SchedulerSimm {
         int[] startTimes = new int[numProcs];
         
         for (int i = 0; i < numProcs; i++) {
-            System.out.println("Enter P" + (i + 1) + " information:");
-            System.out.print("Arrival time: ");
+        System.out.print("Enter arrival time and burst time for Process P" + (i + 1) + ": "); // new 
             arrTimes[i] = sc.nextInt();
-            System.out.print("Burst time: ");
             burstTimes[i] = sc.nextInt();
             remTimes[i] = burstTimes[i];  // Initial remaining time is the same as burst time
             compTimes[i] = -1;  // -1 signifies the process has not been completed yet
             startTimes[i] = -1;  // -1 signifies the process has not started yet
         }
 
-        System.out.println("\nNumber of processes = " + numProcs);
+        System.out.print("\nNumber of processes = " + numProcs);
+         //new 
+        System.out.print("("); // to print the opening parenthesis at the begining 
+
+        for(int i=1 ; i<= numProcs; i++){
+         System.out.print("P" + i);
+
+         if (i<numProcs) // to make sure, there's no comma after the last process
+         System.out.print(",");
+       }// end of the loop
+
+        System.out.println(")");
+       //end of the new part 
+
         for (int i = 0; i < numProcs; i++) {
             System.out.println("P" + (i + 1) + ": Arrival time = " + arrTimes[i] + ", Burst time = " + burstTimes[i] + "ms");
         }
@@ -61,7 +72,7 @@ public class SchedulerSimm {
             if (selectedProc != -1) {
                 // Add context switch if the process changes
                 if (!firstGant.isEmpty() && !firstGant.get(firstGant.size() - 1).processType.endsWith("P" + (selectedProc + 1))) {
-                    firstGant.add(new processGantChart(ctime, ctime + 1, "CS"));
+                    firstGant.add(new processGantChart(ctime, ctime + 1, "         CS"));
                     firstGantCounter++;
                     ctime += switchTime;  // Add context switch time
                 }
@@ -70,7 +81,7 @@ public class SchedulerSimm {
                 recordStart(selectedProc, startTimes);
                 
                 // Add the process event to the Gantt chart
-                firstGant.add(new processGantChart(ctime, ctime + 1, "P" + (selectedProc + 1)));
+                firstGant.add(new processGantChart(ctime, ctime + 1, "         P" + (selectedProc + 1)));
                 firstGantCounter++;
                 
                 // Execute the process for 1ms
@@ -141,7 +152,6 @@ public class SchedulerSimm {
 
     // Displays the results: Gantt chart and performance metrics
     public static void showResults(List<processGantChart> timeline, int numProcs) {
-        System.out.println("\nGantt Chart:");
         System.out.printf("%-10s %s\n", "Time", "Process/CS");
         for (processGantChart gantt : timeline) {
             System.out.printf("%-7s %s\n", gantt.start + "-" + gantt.end, gantt.processType);
