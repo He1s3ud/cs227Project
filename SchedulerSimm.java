@@ -55,7 +55,7 @@ public class SchedulerSimm {
        //end of the new part 
 
         for (int i = 0; i < numProcs; i++) {
-            System.out.println("P" + (i + 1) + ": Arrival time = " + arrTimes[i] + ", Burst time = " + burstTimes[i] + "ms");
+            System.out.println("P" + (i + 1) + ": Arrival time = " + arrTimes[i] + ", Burst time = " + burstTimes[i] + " ms");
         }
         System.out.println("\nScheduling Algorithm: Shortest Remaining Time First");
         System.out.println("Context Switch: 1ms");
