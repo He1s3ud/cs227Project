@@ -1,32 +1,19 @@
-import java.util.*;
-public class processes{
-int processID;
-int arrivalTime;
-int cpuBrust;
-int reminingT;
-public processes(int id,int aTime,int bTime){
-processID=id;
-arrivalTime=aTime;
-cpuBrust=bTime;
-reminingT=bTime;
-}
-public void setID(int i){
-processID=i;
-}
+public class Process {
+    public int  arrivalTime, burstTime, remainingTime, startTime, completTime;
 
-public int getID(){
-return processID;
-}
-public int getATime(){
-return arrivalTime;
-}
 
-public int getBTime(){
-return cpuBrust;
-}
+    public Process(){
+    this.arrivalTime = 0;
+        this.burstTime = 0;
+        this.remainingTime = 0;
+        this.startTime = -1;
+    }
+    
+    public Process( int arrivalTime, int burstTime) {
+        this.arrivalTime = arrivalTime;
+        this.burstTime = burstTime;
+        this.remainingTime = burstTime;
+        this.startTime = -1;
+    }
 
-public int getreminingT(){
-return reminingT;
 }
-}
-
