@@ -1,0 +1,140 @@
+import java.util.*;
+
+public class memory{
+   public static  Scanner input=new Scanner(System.in);
+   public static MemoryBlock[] myMemory;// here we initialze the memory blocks
+   public static int stratigy=-1,numOfReport=0;
+//here we provide the allocateing stratigies
+
+   public static void Allocateing(){
+      System.out.print("Enter process ID and size of process: ");
+      String ID=input.next();
+      int size= input.nextInt();
+      int select=-1;
+      int smallestS=Integer.MAX_VALUE;
+      int biggestS=-1;
+   
+      for(int i=0;i<myMemory.length;i++){
+         if(!myMemory[i].isAllocate()&&myMemory[i].getSize()>=size){
+            if(stratigy==1){//this is first fit stratigy
+               select=i;
+            //myMemory[i].setAllocate(true);
+               break;
+            }
+            else if(stratigy==2){//this is best fit stratigy
+               if(myMemory[i].getSize()<smallestS){
+                  smallestS=myMemory[i].getSize();
+                  select=i;
+               //myMemory[i].setAllocate(true);
+               }
+            }
+            else if(stratigy==3){//this is worest fit stratigy
+               if (myMemory[i].getSize()>biggestS){
+                  biggestS=myMemory[i].getSize();
+                  select=i;
+               //myMemory[i].setAllocate(true);
+               }
+            }
+         }
+      }
+   
+      if(select!=-1){
+         myMemory[select].setAllocate("allocate");
+         myMemory[select].setProcID(ID);
+         myMemory[select].setFrag((myMemory[select].getSize()-size));
+         System.out.println(ID+" Allocated at address: "+myMemory[select].getStart()+", and the internal fragmentation is "+myMemory[select].getFrag());
+         System.out.println("================================================================================");
+      }
+      else
+         System.out.println("Error, we can't allocate the any block for you");
+   }
+
+   public static void deallocating(){
+      boolean findProc=false;
+      System.out.print("Enter the process you want to deallocate: ");
+      String procID=input.next();
+   
+      for(int i=0;i<myMemory.length;i++){
+         if(myMemory[i].isAllocate()&&myMemory[i].getProcID().equalsIgnoreCase(procID)){
+            myMemory[i].setAllocate("free");
+            myMemory[i].setProcID("null");
+            myMemory[i].setFrag(0);
+            findProc=true;
+            System.out.println("deallocate process "+procID+" is success");
+            System.out.println("================================================================================");
+            break;
+         }
+      }
+   
+      if(!findProc)
+         System.out.println("Error, we can't deallcate the process");
+   
+   }
+
+   public static void blocksReport(){
+      if(numOfReport>0){
+         System.out.println("Memory blocks:\n================================================================================");
+         System.out.printf("%-8s %-8s %-8s %-8s %-8s %-8s\n","Block#","size","start-end","statu","procesID","fragment");
+         System.out.println("================================================================================");
+         for(int i=0;i<myMemory.length;i++)
+            System.out.printf("%-8s %-8s %-8s %-10s %-19s %-8s\n",i,myMemory[i].getSize(),myMemory[i].getStart()+"-"+myMemory[i].getEnd(),(myMemory[i].isAllocate()?"Allocate":"Free"),myMemory[i].getProcID(),myMemory[i].getFrag());
+         System.out.println("================================================================================");
+      }
+      else{
+         System.out.println("Memory blocks:\n=============================================");
+         System.out.printf("%-8s %-8s %-8s %-8s\n","Block#","size","start-end","statu");
+         System.out.println("=============================================");
+         for(int i=0;i<myMemory.length;i++)
+            System.out.printf("%-8s %-8s %-8s %-8s\n",i,myMemory[i].getSize(),myMemory[i].getStart()+"-"+myMemory[i].getEnd(),(myMemory[i].isAllocate()?"Allocate":"Free"));
+         System.out.println("=============================================");
+      }
+   }
+
+
+
+   public static void main(String[] args){
+      System.out.print("Enter the number of blocks: ");
+      int num=input.nextInt();
+      myMemory=new MemoryBlock[num];
+      System.out.print("Enter the size of each block in KB: ");
+      int size=0,startSum=0;
+      for (int i=0;i<myMemory.length;i++){
+         size=input.nextInt();
+         myMemory[i]=new MemoryBlock(size,startSum);
+         startSum+=size;
+      }
+      System.out.print("Enter allocation strategy (1 for first-fit, 2 for best-fit, 3 for worst-fit): ");
+      stratigy=input.nextInt();
+      System.out.println("Memory blocks are created...");
+      blocksReport();
+      numOfReport++;
+      int choice=0;
+      do{
+         System.out.println("1) Allocates memory blocks");
+         System.out.println("2) De-allocates memory blocks");
+         System.out.println("3) Print report about the current state of memory and internal Fragmentation");
+         System.out.println("4) Exit");
+         System.out.println("================================================================================");
+         System.out.print("Enter your choice: ");
+         choice=input.nextInt();
+      
+         switch(choice){
+            case 1:
+               Allocateing();
+               break;
+            case 2:
+               deallocating();
+               break;
+            case 3:
+               blocksReport();
+               break;
+            case 4:
+               System.out.println("Have a nice day, bye!");
+               break;
+            default:
+               System.out.println("invalid choice, try another one!");
+         }
+      }while(choice!=4);
+   
+   }
+}
